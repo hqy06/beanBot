@@ -25,15 +25,17 @@ from sklearn.naive_bayes import GaussianNB  # naive bayes
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.metrics import accuracy_score  # accuracy
 
+from sklearn.externals import joblib    # for save/load
 
 # ===============================================
 # Global Variables
 # ===============================================
 DEBUG = False
 VERBOSE = True
-SAVE_MODELS = False
+SAVE_MODELS = True
 DATASET = "Tweets.csv"
 CONFIDENCE_CUTOFF = 0.5
+CONNONTATION = 3
 
 # ===============================================
 # Preprocess Data
@@ -146,7 +148,7 @@ def _show_column_count_by_class(df, count_name, class_name, show_fig=True, save_
     # Draw on axis
     for cla, ax in zip(classes, axis):
         if VERBOSE:
-            print("\t *** {} of class {}".format(count_name, cla))
+            print("*** {} of class {}".format(count_name, cla))
 
         class_df = df[df[class_name] == cla]
         class_col = class_df[count_name]
@@ -190,6 +192,14 @@ def _plot_count_bar_on_ax(axis, df_col, title):
 
 
 def main():
+    if CONNONTATION == 2:
+        connotation = bin_connotation
+    elif CONNONTATION == 3:
+        connotation = tri_connotation
+    else:
+        raise ValueError(
+            'incorrect CONNONTATION number, except 2 or 3, get {} instead'.format(CONNONTATION))
+
     data_frame = pd.read_csv(DATASET)
     if VERBOSE:
         print("\n********** {} dataset info".format(DATASET))
@@ -214,7 +224,7 @@ def main():
                         > CONFIDENCE_CUTOFF]
     # quantify sentiment
     clean_df['sentiment'] = clean_df['airline_sentiment'].apply(
-        bin_connotation)
+        connotation)
     # tokenize
     clean_df['clean_text'] = clean_df['text'].apply(tweet_word_check)
 
@@ -267,10 +277,14 @@ def main():
         test_score = accuracy_score(pred_test, test_df['sentiment'])
 
         if VERBOSE:
-            print("\t test score: {}".format(test_score))
+            print("\ttest score: {:.5f}".format(test_score))
 
     if not DEBUG:
-        print("\t1 for positive, 0 for negative & neutral")
+        if CONNONTATION == 2:
+            print("\n1 for positive, 0 for negative & neutral")
+        if CONNONTATION == 3:
+            print("\n1 for positive, 0 for neutral and -1 for negative")
+
         text = input("Key in a sentence: ")
         while text is not '':
             clean_text = tweet_word_check(text)
@@ -280,12 +294,20 @@ def main():
                     pred = clf.predict(xx)
                 except Exception:
                     pred = clf.predict(xx.toarray())
-                print("{}: ".format(clf.__class__.__name__), pred[0])
+                print("{:>30}: ".format(clf.__class__.__name__), pred[0])
             text = input("Key in a tweet. Press enter to exit: ")
-        print("\n")
+        print(">> Exit prediction model\n")
 
     if SAVE_MODELS:
-        pass
+        for clf in classifiers:
+            f_name = "{} {}.pkl".format(
+                datetime.now().strftime('%Y%m%d-%H%M'), clf.__class__.__name__)
+            joblib.dump(clf, f_name)
+            if VERBOSE:
+                print("* {} saved to pkl file.".format(clf.__class__.__name__))
+    if VERBOSE:
+        print("************ ALL SET!")
+
     return 0
 
 
