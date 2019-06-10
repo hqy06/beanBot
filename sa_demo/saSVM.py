@@ -23,13 +23,15 @@ from sklearn.feature_extraction.text import CountVectorizer  # vectorizer
 from sklearn.naive_bayes import GaussianNB  # naive bayes
 # two classical ensemble methods
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.metrics import accuracy_score  # accuracy
 
 
 # ===============================================
 # Global Variables
 # ===============================================
-DEBUG = True
+DEBUG = False
 VERBOSE = True
+SAVE_MODELS = False
 DATASET = "Tweets.csv"
 CONFIDENCE_CUTOFF = 0.5
 
@@ -196,7 +198,7 @@ def main():
 
     airlines = _show_column_count(data_frame['airline'])
     sentiments = _show_column_count(data_frame['airline_sentiment'])
-    # _show_column_count_by_class(data_frame, "airline_sentiment", "airline")
+    _show_column_count_by_class(data_frame, "airline_sentiment", "airline")
 
     neg_reasons = _show_column_count(data_frame['negativereason'])
     # neg reason for a specific airline
@@ -215,32 +217,75 @@ def main():
         bin_connotation)
     # tokenize
     clean_df['clean_text'] = clean_df['text'].apply(tweet_word_check)
-    # TODO: padding/truncationg
 
     train_df, test_df = train_test_split(
-        clean_df, test_size=0.3, random_state=42)
+        clean_df, test_size=0.2, random_state=42)
 
     train_set = [tweet for tweet in train_df['clean_text']]
     test_set = [tweet for tweet in test_df['clean_text']]
 
-    vector = CountVectorizer(analyzer="word")
-    train_features = vector.fit_transform(train_set)
-    test_features = vector.fit_transform(test_set)
+    v = CountVectorizer(analyzer="word")
+    train_features = v.fit_transform(train_set)
+    test_features = v.transform(test_set)
+    assert (test_features.shape[1] == train_features.shape[1])
+    n_features = test_features.shape[1]
 
     if VERBOSE:
         print("training set of size {}, test set of size {}".format(
             len(train_set), len(test_set)))
+        print("train features: {}, test features: {}".format(
+            train_features.shape, test_features.shape))
         print("\n********** declare classifiers")
 
     # Random Forest
     rand_forest = RandomForestClassifier(n_estimators=200)
     # AdaBoost
-    ada_boost = AdaBoostClassifier()
+    ada_boost = AdaBoostClassifier(n_estimators=100, random_state=0)
     # Naive Bayes with Gaussian
     naive_bayes = GaussianNB()
+    # TODO: RNN LSTM or CNN
 
-    Classifiers = [rand_forest, ada_boost, naive_bayes]
+    classifiers = [rand_forest, ada_boost, naive_bayes]
 
+    if VERBOSE:
+        print("\n********** classification in progress")
+
+    for clf in classifiers:
+        if VERBOSE:
+            print("Classifier: {}".format(clf.__class__.__name__))
+        try:
+            clf.fit(train_features, train_df['sentiment'])
+            pred_test = clf.predict(test_features)
+        except Exception:   # for Gaussian Naive Bayes
+            if DEBUG and VERBOSE:
+                print("\tException Caught!")
+            model = clf.fit(
+                train_features.toarray(), train_df['sentiment'])
+            pred_test = clf.predict(test_features.toarray())
+
+        # train_socre = accuracy_score(pred_train, test_df['sentiment'])
+        test_score = accuracy_score(pred_test, test_df['sentiment'])
+
+        if VERBOSE:
+            print("\t test score: {}".format(test_score))
+
+    if not DEBUG:
+        print("\t1 for positive, 0 for negative & neutral")
+        text = input("Key in a sentence: ")
+        while text is not '':
+            clean_text = tweet_word_check(text)
+            xx = v.transform([clean_text])
+            for clf in classifiers:
+                try:
+                    pred = clf.predict(xx)
+                except Exception:
+                    pred = clf.predict(xx.toarray())
+                print("{}: ".format(clf.__class__.__name__), pred[0])
+            text = input("Key in a tweet. Press enter to exit: ")
+        print("\n")
+
+    if SAVE_MODELS:
+        pass
     return 0
 
 
