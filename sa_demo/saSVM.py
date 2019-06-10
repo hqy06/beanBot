@@ -17,7 +17,13 @@ import collections
 import re           # regex
 import nltk         # working with NLP
 from nltk.corpus import stopwords   # english stopwords
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split   # train-test split
+from sklearn.feature_extraction.text import CountVectorizer  # vectorizer
+
+from sklearn.naive_bayes import GaussianNB  # naive bayes
+# two classical ensemble methods
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+
 
 # ===============================================
 # Global Variables
@@ -190,25 +196,25 @@ def main():
 
     airlines = _show_column_count(data_frame['airline'])
     sentiments = _show_column_count(data_frame['airline_sentiment'])
-    _show_column_count_by_class(data_frame, "airline_sentiment", "airline")
+    # _show_column_count_by_class(data_frame, "airline_sentiment", "airline")
 
     neg_reasons = _show_column_count(data_frame['negativereason'])
     # neg reason for a specific airline
     # df = data_frame[data_frame['airline']==airline_name]
     # airline_neg = _show_column_count(df['negativereason'])
-    neg_reason_confidence = _
 
     if VERBOSE:
         print("\n********** Prepare the dataset")
 
     clean_df = data_frame.copy()
     # only keep airline_sentiment larger than CONFIDENCE_CUTOFF
-    clean_df = clean_df[clean_df['airline_sentiment'] > CONFIDENCE_CUTOFF]
+    clean_df = clean_df[clean_df['airline_sentiment_confidence']
+                        > CONFIDENCE_CUTOFF]
     # quantify sentiment
     clean_df['sentiment'] = clean_df['airline_sentiment'].apply(
         bin_connotation)
     # tokenize
-    clean_df['clean_text'].apply(tweet_word_check)
+    clean_df['clean_text'] = clean_df['text'].apply(tweet_word_check)
     # TODO: padding/truncationg
 
     train_df, test_df = train_test_split(
@@ -217,10 +223,23 @@ def main():
     train_set = [tweet for tweet in train_df['clean_text']]
     test_set = [tweet for tweet in test_df['clean_text']]
 
+    vector = CountVectorizer(analyzer="word")
+    train_features = vector.fit_transform(train_set)
+    test_features = vector.fit_transform(test_set)
+
     if VERBOSE:
         print("training set of size {}, test set of size {}".format(
             len(train_set), len(test_set)))
         print("\n********** declare classifiers")
+
+    # Random Forest
+    rand_forest = RandomForestClassifier(n_estimators=200)
+    # AdaBoost
+    ada_boost = AdaBoostClassifier()
+    # Naive Bayes with Gaussian
+    naive_bayes = GaussianNB()
+
+    Classifiers = [rand_forest, ada_boost, naive_bayes]
 
     return 0
 
