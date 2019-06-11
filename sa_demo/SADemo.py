@@ -72,6 +72,47 @@ def tweet_word_check(raw_tweet):
 def tweet_length_clean(raw_tweet):
     pass
 
+
+def get_pred_results(pred, pred_prob, connotation_type=CONNONTATION):
+    """
+    --- dimensional math:
+    pred is a 1-by-N matrix, where N is number of prediction made.
+    pred_prob is a N-by-M matrix, where M is the size of support (==connotation_type)
+    ---
+    returns 2-tuple of lists. (confidence_for_each_prediction, result_of_prediction)
+    """
+    results = []
+    confidences = []
+    n_pred = pred.shape[0]
+    for i in range(n_pred):
+        y = pred[i]  # label of this prediction
+        results.append(_decode_connotation(y, connotation_type))
+        confidences.append(_get_confidence(y, pred_prob[i], connotation_type))
+    assert (len(results) == len(confidences) == n_pred)
+    return confidences, results
+
+
+def _decode_connotation(y, connotation_type):
+    assert (connotation_type == 2 or connotation_type == 3)
+    if connotation_type == 2:
+        result = "positive" if y == 1 else "negative/neutral"
+    else:
+        if y == 0:
+            result = "neutral"
+        else:
+            result = "positive" if y == 1 else "negative"
+    return result
+
+
+def _get_confidence(y, y_prob, connotation_type):
+    assert (connotation_type == 2 or connotation_type == 3)
+    if connotation_type == 2:
+        confidence = y_prob[y]
+    else:
+        confidence = y_prob[y + 1]
+    return confidence
+
+
 # ===============================================
 # Visualize Data
 # ===============================================
@@ -250,7 +291,7 @@ def main():
     # Random Forest
     rand_forest = RandomForestClassifier(n_estimators=200)
     # AdaBoost
-    ada_boost = AdaBoostClassifier(n_estimators=100, random_state=0)
+    ada_boost = AdaBoostClassifier(n_estimators=100, random_state=42)
     # Naive Bayes with Gaussian
     naive_bayes = GaussianNB()
     # TODO: RNN LSTM or CNN
@@ -290,11 +331,17 @@ def main():
             clean_text = tweet_word_check(text)
             xx = v.transform([clean_text])
             for clf in classifiers:
+                clf_name = clf.__class__.__name__
                 try:
                     pred = clf.predict(xx)
+                    pred_prob = clf.predict_proba(xx)
                 except Exception:
                     pred = clf.predict(xx.toarray())
-                print("{:>30}: ".format(clf.__class__.__name__), pred[0])
+                    pred_prob = clf.predict_proba(xx.toarray())
+                confidences, results = get_pred_results(
+                    pred, pred_prob, CONNONTATION)
+                print("{:>30} | {} {:>15} {:.5f}" .format(
+                    clf_name, pred[0], results[0], confidences[0]))
             text = input("Key in a tweet. Press enter to exit: ")
         print(">> Exit prediction model\n")
 
