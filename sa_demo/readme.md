@@ -1,6 +1,6 @@
 This is a simple demo of sentiment analysis using ~~PyTorch~~ `sci-kit learn`.
 
-Currently WIP (work in progress)
+What's Next: use deep learning to do the analysis. Ref [1](https://blog.usejournal.com/sentiment-classification-with-natural-language-processing-on-lstm-4dc0497c1f19) and [2](https://towardsdatascience.com/sentiment-analysis-using-lstm-step-by-step-50d074f09948)
 
 Dataset used: US airline twitter from [kaggle](https://www.kaggle.com/crowdflower/twitter-airline-sentiment)
 
@@ -28,3 +28,5 @@ Also, a simple SVM can only do binary classification. And I want to avoid the on
 - [Emotion Space Model [paper](https://ieeexplore.ieee.org/document/5313815)
 
 - Feature selection: chi-squre
+
+- Confidence Level: [Q & A](https://datascience.stackexchange.com/questions/44215/confidence-score-for-trained-sentiment-analyser-model)
