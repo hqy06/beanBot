@@ -97,6 +97,7 @@ def main():
     words = get_stems(STEM)
     synonyms = generate_synonyms(words, remove_duplicate=True)
     save_generated_words(synonyms)
+    print('not good')
 
 
 if __name__ == "__main__":
