@@ -21,7 +21,7 @@ This is the keyword embedding ~~word2vec~~ part of beanBot project, in which we 
 
 [x] For each technique, do more readings.
 
-[ ] Generate dataset using WordNet\*
+[x] Generate dataset using WordNet\*
 
 [ ] Start coding......
 
