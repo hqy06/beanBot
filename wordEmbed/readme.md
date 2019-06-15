@@ -2,7 +2,7 @@
 
 This is the keyword embedding ~~word2vec~~ part of beanBot project, in which we will try several embedding ~~wrod2vec~~ techniques and see how well they are performancing.
 
-**[status]** Currently WIP (work in progress)
+**[status]** Hiatus.
 
 **[Assigned to]** Fiona!
 
@@ -21,9 +21,11 @@ This is the keyword embedding ~~word2vec~~ part of beanBot project, in which we 
 
 [x] For each technique, do more readings.
 
-[x] Generate dataset using WordNet\*
+[x] Generate synonyms ~~dataset~~ using WordNet\*
 
-[ ] Start coding......
+[x] A way to generate a "mental wellness" dataset
+
+[ ] ~~Start coding......~~ hiatus
 
 ### Note to Self
 
