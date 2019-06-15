@@ -1,0 +1,5 @@
+Where to find the web?
+http://127.0.0.1:5000/chatbot
+
+How to test it on terminal?
+curl localhost:5000/chatbot -d '{"goal":"sleep"}' -H 'Content-Type: application/json'
