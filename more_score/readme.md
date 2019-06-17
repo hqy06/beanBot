@@ -12,6 +12,7 @@ This implements the 2nd step.
 ### Data
 
 Single user data: cooked up
+
 Service features: preprocessed using keyword extracter, a bunch of keyword with "importancy rate"
 
 ### Cosine similarity:
