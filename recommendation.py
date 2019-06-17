@@ -30,6 +30,12 @@ N_SERVICE = 10
 N_FEATURE = 4
 # top k choices!
 TOP_K = 3
+# importancy cutoff
+CUTOFF = similarity.IMPORTANCY_CUTOFF
+# maximum number of keywords for each service
+N_KEYWORD = similarity.N_KEYWORD
+# verbose?
+VERBOSE = True
 
 
 # ===============================================
@@ -37,8 +43,8 @@ TOP_K = 3
 # ===============================================
 def main():
     # services
-    services = ['PSC', 'TAO', 'Group', 'PhD', 'Tea', '7Cups',
-                'Nightline', 'listening', 'SACOMSS', 'Buddy']
+    services = ['Peer Support Center', 'Therapist Assisted Online', 'Group Therapy', 'PhD Support Group', 'Vent Over Tea', '7 Cups',
+                'McGill Student\'s Nightline', 'Project 10 Listening Line', 'SACOMSS Support Group', 'The Buddy Programm']
     assert (len(services) == N_SERVICE)
 
     # inupt from user's end:
@@ -56,14 +62,16 @@ def main():
     match_weights = np.random.random_sample(N_FEATURE)
 
     s_score, m_score = evaluation.calculate_scores(
-        user_profile.keys(), user_profile, review_dataframe, (service_weights, match_weights))
-
-    print("service score: {}\nmatchness score: {}".format(s_score, m_score))
+        user_profile.keys(), user_profile, review_dataframe, (service_weights, match_weights), verbose=VERBOSE, n_service=N_SERVICE, n_feature=N_FEATURE)
 
     # similarity between service description & user's goal
-    service_keywords = similarity.fetch_data(SERVICE_KEYWORD_FOLDER)
-    d_score = similarity.calculate_scores(user_goal, service_keywords)
-    print("description score: {}".format(d_score))
+    service_keywords = similarity.fetch_data(
+        SERVICE_KEYWORD_FOLDER, n_service=N_SERVICE)
+    d_score = similarity.calculate_scores(
+        user_goal, service_keywords, n_service=N_SERVICE, n_keyword=N_KEYWORD, cut_off=CUTOFF)
+    if VERBOSE:
+        print("service score: {}\nmatchness score: {}".format(s_score, m_score))
+        print("description score: {}".format(d_score))
 
     # total score!
     total_scores = np.array(s_score) + np.array(m_score) + d_score
@@ -75,6 +83,7 @@ def main():
     for i in range(TOP_K):
         index = indices[i]
         recommend.append((services[index], total_scores[index]))
+
     print(recommend)
 
 

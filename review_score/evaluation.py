@@ -31,19 +31,21 @@ def _calulate_numercial(scores, type="avg"):
             "invalid type, expecting avg or l2, get {}".format(type))
 
 
-def calculate_scores(features, user_profile, df, weights):
+def calculate_scores(features, user_profile, df, weights, verbose=True, n_service=N_SERVICE, n_feature=N_FEATURE):
     s_scores, m_scores = [], []
     (s_weight, m_weight) = weights
-    for s in range(N_SERVICE):
+    for s in range(n_service):
         service_df = df.loc[df["sID"] == s + 1]
         f_sscores, f_mscores = [], []
         if len(service_df) == 0:
-            print("nothing mathces! use dummy entry with all scores set to 2.5")
+            if verbose:
+                print(
+                    "nothing mathces for service #{}! use dummy entry with all scores set to 2.5".format(s + 1))
             # s_scores.append("nan")
             # m_scores.append("nan")
             dummy_socre = 2.5
-            f_sscores = [dummy_socre for _ in range(N_FEATURE)]
-            f_mscores = [dummy_socre for _ in range(N_FEATURE)]
+            f_sscores = [dummy_socre for _ in range(n_feature)]
+            f_mscores = [dummy_socre for _ in range(n_feature)]
             # continue
         else:
             # print("into feautres")
@@ -58,8 +60,8 @@ def calculate_scores(features, user_profile, df, weights):
                 feature_mscores = feature_df["m_score"].values
                 f_sscores.append(_calulate_numercial(feature_sscores))
                 f_mscores.append(_calulate_numercial(feature_mscores))
-        s_score = np.dot(f_sscores, s_weight) / N_FEATURE
-        m_score = np.dot(f_mscores, m_weight) / N_FEATURE
+        s_score = np.dot(f_sscores, s_weight) / n_feature
+        m_score = np.dot(f_mscores, m_weight) / n_feature
         # print(s + 1, s_score, m_score)
         s_scores.append(s_score)
         m_scores.append(m_score)
