@@ -9,5 +9,12 @@ This implements the 2nd step.
 4. Combine all the scores above (with normalization and weighting) obtain ratings for all services in the case of user profile P. Find top k and return.
 ```
 
+### Data
+
 Single user data: cooked up
 Service features: preprocessed using keyword extracter, a bunch of keyword with "importancy rate"
+
+### Cosine similarity:
+
+> We can use the Cosine Similarity algorithm to work out the similarity between two things. We might then use the computed similarity as part of a recommendation query. For example, to get movie recommendations based on the preferences of users who have given similar ratings to other movies that you’ve seen.
+> Checkout this [tutorial](https://www.machinelearningplus.com/nlp/cosine-similarity/)
