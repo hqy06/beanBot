@@ -28,12 +28,19 @@ SERVICE_KEYWORD_FOLDER = "more_score\\keywords"
 N_SERVICE = 10
 # number of deterministic user features, e.g. language, gender, etc
 N_FEATURE = 4
+# top k choices!
+TOP_K = 3
 
 
 # ===============================================
 # Main
 # ===============================================
 def main():
+    # services
+    services = ['PSC', 'TAO', 'Group', 'PhD', 'Tea', '7Cups',
+                'Nightline', 'listening', 'SACOMSS', 'Buddy']
+    assert (len(services) == N_SERVICE)
+
     # inupt from user's end:
     user_profile = {"ufeature1": "F", "ufeature2": "fr",
                     "ufeature3": "U3", "ufeaure4": "CA"}
@@ -51,8 +58,6 @@ def main():
     s_score, m_score = evaluation.calculate_scores(
         user_profile.keys(), user_profile, review_dataframe, (service_weights, match_weights))
 
-    len(s_score)
-
     print("service score: {}\nmatchness score: {}".format(s_score, m_score))
 
     # similarity between service description & user's goal
@@ -60,8 +65,17 @@ def main():
     d_score = similarity.calculate_scores(user_goal, service_keywords)
     print("description score: {}".format(d_score))
 
-    # total_scores = s_score + m_score + d_score
-    # print(total_scores)
+    # total score!
+    total_scores = np.array(s_score) + np.array(m_score) + d_score
+    print(total_scores)
+
+    # find the top-k services
+    indices = np.argsort(total_scores)
+    recommend = []
+    for i in range(TOP_K):
+        index = indices[i]
+        recommend.append((services[index], total_scores[index]))
+    print(recommend)
 
 
 if __name__ == "__main__":

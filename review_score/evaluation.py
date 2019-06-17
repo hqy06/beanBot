@@ -36,24 +36,28 @@ def calculate_scores(features, user_profile, df, weights):
     (s_weight, m_weight) = weights
     for s in range(N_SERVICE):
         service_df = df.loc[df["sID"] == s + 1]
-        if len(service_df) == 0:
-            print("nothing mathces!")
-            s_scores.append("nan")
-            m_scores.append("nan")
-            continue
         f_sscores, f_mscores = [], []
-        # print("into feautres")
-        for f in features:
-            feature_df = service_df[service_df[f] == user_profile[f]]
-            n_entries = len(feature_df)
-            if n_entries == 0:
-                f_sscores.append(2.5)
-                f_mscores.append(2.5)
-                continue
-            feature_sscores = feature_df["s_score"].values
-            feature_mscores = feature_df["m_score"].values
-            f_sscores.append(_calulate_numercial(feature_sscores))
-            f_mscores.append(_calulate_numercial(feature_mscores))
+        if len(service_df) == 0:
+            print("nothing mathces! use dummy entry with all scores set to 2.5")
+            # s_scores.append("nan")
+            # m_scores.append("nan")
+            dummy_socre = 2.5
+            f_sscores = [dummy_socre for _ in range(N_FEATURE)]
+            f_mscores = [dummy_socre for _ in range(N_FEATURE)]
+            # continue
+        else:
+            # print("into feautres")
+            for f in features:
+                feature_df = service_df[service_df[f] == user_profile[f]]
+                n_entries = len(feature_df)
+                if n_entries == 0:
+                    f_sscores.append(2.5)
+                    f_mscores.append(2.5)
+                    continue
+                feature_sscores = feature_df["s_score"].values
+                feature_mscores = feature_df["m_score"].values
+                f_sscores.append(_calulate_numercial(feature_sscores))
+                f_mscores.append(_calulate_numercial(feature_mscores))
         s_score = np.dot(f_sscores, s_weight) / N_FEATURE
         m_score = np.dot(f_mscores, m_weight) / N_FEATURE
         # print(s + 1, s_score, m_score)
