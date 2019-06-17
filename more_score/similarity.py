@@ -16,8 +16,8 @@ import re
 DATASET_FOLDER = 'keywords'
 N_FEATURE = 4               # number of user featues
 N_SERVICE = 10              # number of services
-N_KEYWORD = 10              # maximum number of keywords for each service
-IMPORTANCY_CUTOFF = 0.01    # minimum "importancy" allowed for keywords.
+N_KEYWORD = 7               # maximum number of keywords for each service
+IMPORTANCY_CUTOFF = 0.12    # minimum "importancy" allowed for keywords.
 
 # ===============================================
 # Load and clean the data
@@ -59,23 +59,77 @@ def _read_and_clean_csv(file_names, folder_path):
         dataframes.append(df)
     return dataframes
 
+
 # ===============================================
 # Calculate Score
 # ===============================================
 
 
-def calculate_scores(user_goal, service_keyword_df):
+def calculate_scores(user_goal, service_keywords):
     # vectorization
     user_vector, service_vectors = vectorize(
-        user_goal, service_keyword_df.values)
+        user_goal, service_keywords)
 
     # cosine similarity
     return
 
 
-def _vectorizer(user_goal, weighted_keywords):
-    return
+def vectorize(user_goal, weighted_keywords, n_keyword=N_KEYWORD, cut_off=IMPORTANCY_CUTOFF):
+    """user_goal is a 2-nested list, weighted_keywords a 3-nested list.
+    user_vector of shape (n_vocab,); service_vectors of shape(N_SERVICE, n_vocab)
+    """
+    # vectorize keywords and create dictionary
+    vocabulary_set = create_vocabulary(
+        user_goal, weighted_keywords, n_keyword, cut_off)
+    vocabulary = list(vocabulary_set)
+    user_vector = create_single_vector(user_goal, vocabulary)
+    service_vectors = create_bunch_vector(weighted_keywords, vocabulary)
+    assert (user_vector.shape[0] == service_vectors.shape[1]
+            ), "number of vocabulary should be equal!"
+    assert (service_vectors.shape[0] == N_SERVICE)
+    return vocabulary, user_vector, service_vectors
 
+
+def create_vocabulary(user_goal, weighted_keywords, n_keyword=N_KEYWORD, cut_off=IMPORTANCY_CUTOFF):
+    """findout the vocabulary given the maximum number of keyword and the minimum cutoff"""
+    dict_set = set()
+    for word, coeff in user_goal:
+        dict_set.add(word)
+    for s_keywords in weighted_keywords:
+        for word, coeff in s_keywords:
+            counter = 0
+            if coeff > IMPORTANCY_CUTOFF:
+                dict_set.add(word)
+                counter += 1
+            if counter == N_KEYWORD:
+                break
+    return dict_set
+
+
+def create_single_vector(nested_list, vocabulary):
+    word_num_dict = _to_dictionary(nested_list)
+    vect = []
+    for word in vocabulary:
+        if word in word_num_dict:
+            vect.append(word_num_dict[word])
+        else:
+            vect.append(0)
+    return np.array(vect)
+
+
+def create_bunch_vector(weighted_keywords, vocabulary):
+    results = []
+    for nested_list in weighted_keywords:
+        vector = create_single_vector(nested_list, vocabulary)
+        results.append(vector)
+    return np.array(results)
+
+
+def _to_dictionary(nested_list):
+    dict = {}
+    for word, coeff in nested_list:
+        dict[word] = coeff
+    return dict
 
 # ===============================================
 # Main
@@ -83,8 +137,11 @@ def _vectorizer(user_goal, weighted_keywords):
 
 
 def main():
-    service_keywords = pd.read_csv(DATASET)
-    usr_goal = []
+    service_keywords = fetch_data(folder=DATASET_FOLDER)
+    usr_goal = [['time', 0.5], ['talk', 0.5],
+                ['friendly', 0.5], ['advice', 0.5]]
+    assert (len(usr_goal) == N_FEATURE), "wrong number of user features, expecting {}, get {} instead.".format(
+        N_FEATURE, len(usr_goal))
 
     d_scores = calculate_scores(usr_goal, service_keywords)
 

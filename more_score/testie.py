@@ -28,5 +28,19 @@ data = dataframes[0]
 data
 
 type(data.values)
+service_keywords = similarity.fetch_data(similarity.DATASET_FOLDER)
 
-similarity.fetch_data(similarity.DATASET_FOLDER)
+
+# %% vectorization
+usr_goal = [['time', 0.5], ['talk', 0.5],
+            ['friendly', 0.5], ['advice', 0.5]]
+reload(similarity)
+vocabulary = list(similarity.create_vocabulary(usr_goal, service_keywords))
+similarity.create_dictionary(usr_goal)
+similarity.create_single_vector(usr_goal, vocabulary)
+matrix = similarity.create_bunch_vector(service_keywords, vocabulary)
+matrix.shape
+similarity.vectorize(usr_goal, service_keywords)
+
+
+# %%
