@@ -6,6 +6,7 @@ import similarity
 import pandas as pd
 import numpy as np
 import os
+from sklearn.metrics.pairwise import cosine_similarity
 
 # %% testing packages
 import sys
@@ -40,7 +41,12 @@ similarity.create_dictionary(usr_goal)
 similarity.create_single_vector(usr_goal, vocabulary)
 matrix = similarity.create_bunch_vector(service_keywords, vocabulary)
 matrix.shape
-similarity.vectorize(usr_goal, service_keywords)
+_, u_vec, s_matrix = similarity.vectorize(usr_goal, service_keywords)
 
 
 # %%
+reload(similarity)
+cosine_similarity(u_vec.reshape(1, u_vec.shape[0]), s_matrix)
+sim = similarity.calculate_scores(usr_goal, service_keywords)
+sim.shape
+sim.reshape(sim.shape[1], 1)

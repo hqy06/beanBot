@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import os
 import re
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 # ===============================================
@@ -67,11 +68,14 @@ def _read_and_clean_csv(file_names, folder_path):
 
 def calculate_scores(user_goal, service_keywords):
     # vectorization
-    user_vector, service_vectors = vectorize(
+    vocab, user_vector, service_vectors = vectorize(
         user_goal, service_keywords)
 
     # cosine similarity
-    return
+    similarity = cosine_similarity(user_vector.reshape(
+        1, user_vector.shape[0]), service_vectors)
+
+    return similarity.reshape(similarity.shape[1], 1)
 
 
 def vectorize(user_goal, weighted_keywords, n_keyword=N_KEYWORD, cut_off=IMPORTANCY_CUTOFF):
