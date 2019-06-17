@@ -75,7 +75,7 @@ def calculate_scores(user_goal, service_keywords):
     similarity = cosine_similarity(user_vector.reshape(
         1, user_vector.shape[0]), service_vectors)
 
-    return similarity.reshape(similarity.shape[1], 1)
+    return similarity.reshape(similarity.shape[1])
 
 
 def vectorize(user_goal, weighted_keywords, n_keyword=N_KEYWORD, cut_off=IMPORTANCY_CUTOFF):

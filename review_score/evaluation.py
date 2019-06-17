@@ -14,7 +14,7 @@ import pandas as pd
 # ===============================================
 DATASET = "dummy.csv"
 N_FEATURE = 4
-N_SERVICE = 4
+N_SERVICE = 10
 
 
 # ===============================================
