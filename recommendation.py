@@ -35,7 +35,7 @@ CUTOFF = 0.15
 # maximum number of keywords for each service
 N_KEYWORD = 6
 # verbose?
-VERBOSE = True
+VERBOSE = False
 
 
 # ===============================================
@@ -82,7 +82,7 @@ def main():
 
     # total score: can do other fancy stuffs with it.
     total_scores = np.array(s_score) + np.array(m_score) + d_score
-    print(total_scores)
+    print("\ntotal scores:\n\t{}".format(total_scores))
 
     # find the top-k services
     indices = np.argsort(total_scores)
@@ -91,7 +91,7 @@ def main():
         index = indices[i]
         recommend.append((services[index], total_scores[index]))
 
-    print(recommend)
+    print("\nrecommendation:\n\t{}".format(recommend))
 
     # print("\n {} of type{}".format(indices, type(indices)))
 
@@ -101,10 +101,11 @@ def main():
                    '7 Cups': (4, 5)}
     user_scores = evaluation.process_user_rating(user_rating, k=TOP_K)
 
-    print("\n old weights: {}, {}".format(service_weights, match_weights))
+    print("\nOld weights:\n\t{}\n\t{}".format(service_weights, match_weights))
     service_weights, match_weights = evaluation.update_weights(
         (service_weights, match_weights), user_profile, user_scores, indices[:TOP_K], review_dataframe, lr=0.01, verbose=False, n_service=N_SERVICE, n_feature=N_FEATURE)
-    print("\n new weights: {}, {}".format(service_weights, match_weights))
+    print("Given feedback\n\t{}\nupdate to new weights:\n\t{}\n\t{}".format(
+        user_rating, service_weights, match_weights))
 
 
 if __name__ == "__main__":
