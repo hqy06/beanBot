@@ -31,11 +31,19 @@ N_FEATURE = 4
 # top k choices!
 TOP_K = 3
 # importancy cutoff
-CUTOFF = similarity.IMPORTANCY_CUTOFF
+CUTOFF = 0.15
 # maximum number of keywords for each service
-N_KEYWORD = similarity.N_KEYWORD
+N_KEYWORD = 6
 # verbose?
 VERBOSE = True
+
+
+# ===============================================
+# Updating the weight: a learning model
+# ===============================================
+def init_weights(n_feature=N_FEATURE):
+    """randomly init weights for feature scores from review database"""
+    return np.random.random_sample(n_feature), np.random.random_sample(n_feature)
 
 
 # ===============================================
@@ -58,10 +66,9 @@ def main():
     # review dataset
     review_dataframe = pd.read_csv(REVIEW_DATABASE)
     # random weights for service and matchness
-    service_weights = np.random.random_sample(N_FEATURE)
-    match_weights = np.random.random_sample(N_FEATURE)
+    service_weights, match_weights = init_weights(N_FEATURE)
 
-    s_score, m_score = evaluation.calculate_scores(
+    s_score, m_score, _, _ = evaluation.calculate_scores(
         user_profile.keys(), user_profile, review_dataframe, (service_weights, match_weights), verbose=VERBOSE, n_service=N_SERVICE, n_feature=N_FEATURE)
 
     # similarity between service description & user's goal
@@ -73,7 +80,7 @@ def main():
         print("service score: {}\nmatchness score: {}".format(s_score, m_score))
         print("description score: {}".format(d_score))
 
-    # total score!
+    # total score: can do other fancy stuffs with it.
     total_scores = np.array(s_score) + np.array(m_score) + d_score
     print(total_scores)
 
@@ -85,6 +92,19 @@ def main():
         recommend.append((services[index], total_scores[index]))
 
     print(recommend)
+
+    # print("\n {} of type{}".format(indices, type(indices)))
+
+    # update_weights
+    user_rating = {'Group Therapy': (3, 5),
+                   'Vent Over Tea': (5, 5),
+                   '7 Cups': (4, 5)}
+    user_scores = evaluation.process_user_rating(user_rating, k=TOP_K)
+
+    print("\n old weights: {}, {}".format(service_weights, match_weights))
+    service_weights, match_weights = evaluation.update_weights(
+        (service_weights, match_weights), user_profile, user_scores, indices[:TOP_K], review_dataframe, lr=0.01, verbose=False, n_service=N_SERVICE, n_feature=N_FEATURE)
+    print("\n new weights: {}, {}".format(service_weights, match_weights))
 
 
 if __name__ == "__main__":
