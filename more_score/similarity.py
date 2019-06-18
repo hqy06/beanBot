@@ -15,7 +15,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Global Variables
 # ===============================================
 DATASET_FOLDER = 'keywords'
-N_FEATURE = 4               # number of user featues
+# N_FEATURE = 4               # number of user featues
 N_SERVICE = 10              # number of services
 N_KEYWORD = 7               # maximum number of keywords for each service
 IMPORTANCY_CUTOFF = 0.12    # minimum "importancy" allowed for keywords.
@@ -25,10 +25,10 @@ IMPORTANCY_CUTOFF = 0.12    # minimum "importancy" allowed for keywords.
 # ===============================================
 
 
-def fetch_data(folder=DATASET_FOLDER):
+def fetch_data(folder=DATASET_FOLDER, n_service=N_SERVICE):
     files = list_by_extension(folder)
-    assert (N_SERVICE == len(files)), "wrong number of keyword csv files detected, expecting {}, get{}".format(
-        N_SERVICE, len(files))
+    assert (n_service == len(files)), "wrong number of keyword csv files detected, expecting {}, get{}".format(
+        n_service, len(files))
     cleaned_dfs = _read_and_clean_csv(files, folder)
     service_keywords = []
     for df in cleaned_dfs:
@@ -66,19 +66,19 @@ def _read_and_clean_csv(file_names, folder_path):
 # ===============================================
 
 
-def calculate_scores(user_goal, service_keywords):
+def calculate_scores(user_goal, service_keywords, n_service=N_SERVICE, n_keyword=N_KEYWORD, cut_off=IMPORTANCY_CUTOFF):
     # vectorization
     vocab, user_vector, service_vectors = vectorize(
-        user_goal, service_keywords)
+        user_goal, service_keywords, n_service, n_keyword, cut_off)
 
     # cosine similarity
     similarity = cosine_similarity(user_vector.reshape(
         1, user_vector.shape[0]), service_vectors)
 
-    return similarity.reshape(similarity.shape[1], 1)
+    return similarity.reshape(similarity.shape[1])
 
 
-def vectorize(user_goal, weighted_keywords, n_keyword=N_KEYWORD, cut_off=IMPORTANCY_CUTOFF):
+def vectorize(user_goal, weighted_keywords, n_service=N_SERVICE, n_keyword=N_KEYWORD, cut_off=IMPORTANCY_CUTOFF):
     """user_goal is a 2-nested list, weighted_keywords a 3-nested list.
     user_vector of shape (n_vocab,); service_vectors of shape(N_SERVICE, n_vocab)
     """
@@ -102,10 +102,10 @@ def create_vocabulary(user_goal, weighted_keywords, n_keyword=N_KEYWORD, cut_off
     for s_keywords in weighted_keywords:
         for word, coeff in s_keywords:
             counter = 0
-            if coeff > IMPORTANCY_CUTOFF:
+            if coeff > cut_off:
                 dict_set.add(word)
                 counter += 1
-            if counter == N_KEYWORD:
+            if counter == n_keyword:
                 break
     return dict_set
 
@@ -144,8 +144,8 @@ def main():
     service_keywords = fetch_data(folder=DATASET_FOLDER)
     usr_goal = [['time', 0.5], ['talk', 0.5],
                 ['friendly', 0.5], ['advice', 0.5]]
-    assert (len(usr_goal) == N_FEATURE), "wrong number of user features, expecting {}, get {} instead.".format(
-        N_FEATURE, len(usr_goal))
+    # assert (len(usr_goal) == N_FEATURE), "wrong number of user features, expecting {}, get {} instead.".format(
+    #     N_FEATURE, len(usr_goal))
 
     d_scores = calculate_scores(usr_goal, service_keywords)
 
