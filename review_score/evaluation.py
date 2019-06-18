@@ -41,7 +41,7 @@ def calculate_scores(features, user_profile, df, weights, verbose=False, n_servi
         if len(service_df) == 0:
             if verbose:
                 print(
-                    "nothing mathces for service #{}! use dummy entry with all scores set to 2.5".format(s + 1))
+                    "\tnothing mathces for service #{}! use dummy entry with all scores set to 2.5".format(s + 1))
             # s_scores.append("nan")
             # m_scores.append("nan")
             dummy_socre = 2.5
