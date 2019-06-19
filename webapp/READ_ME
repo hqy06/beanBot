@@ -1,5 +1,11 @@
-How to setup Flask?
+Set up local server:
+brew cask install ngrok 
+ngrok http 5000 
+web will be specified on terminal
+
+How to setup Flask:
 pip install Flask
+export FLASK_ENV=development (sets up debugger so that local changes are updated in run immediately)
 FLASK_APP=app.py 
 flask run
 
