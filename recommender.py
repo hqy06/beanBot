@@ -93,16 +93,17 @@ class recommender:
 
         # pick the top-k services
         indices = np.argsort(total_scores)
+        names = []
+        recommend = []
+        for i in range(self.top_k):
+            index = indices[i]
+            recommend.append((self.services[index], total_scores[index]))
+            names.append(self.services[index])
         if verbose:
-            recommend = []
-            for i in range(self.top_k):
-                index = indices[i]
-                recommend.append(
-                    (self.services[index], total_scores[index]))
             print("\nrecommendation: {}".format(recommend))
 
         # return the indices of top_k choices.
-        return indices[:self.top_k]
+        return indices[:self.top_k], names
 
     def process_user_rating(self, user_rating):
         return evaluation.process_user_rating(user_rating, k=self.top_k)
@@ -138,11 +139,16 @@ def main():
                    '7 Cups': (4, 5)}
 
     # get the service index of top_k choices, start from 0
-    choices = rr.get_recommendation(user_profile, user_goal, verbose=True)
+    choices, service_names = rr.get_recommendation(
+        user_profile, user_goal, verbose=False)
+    print("returned indices (start from 0): {}".format(choices))
+    choices_for_chatbot = [c + 1 for c in choices]
+    print("service indicies (start from 1): {}".format(choices_for_chatbot))
+    print("returned names:{}".format(service_names))
 
     # update the weights (ML-ish learning)
     user_scores = rr.process_user_rating(user_rating)
-    rr.update_weights(user_profile, user_scores, choices, verbose=True)
+    rr.update_weights(user_profile, user_scores, choices, verbose=False)
 
 
 if __name__ == "__main__":
