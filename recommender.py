@@ -1,5 +1,7 @@
 """
 This is a wrapper for the recommendation.py
+
+In the review_database, service id shall starts from 0, all text shall be in lowercase!
 """
 
 # ===============================================

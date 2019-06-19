@@ -61,7 +61,8 @@ def calculate_scores(features, user_profile, df, weights, verbose=False, n_servi
                     f_mscores.append(0)
                     # assign zero to feature's service score/matchness score
                     continue
-                feature_df = service_df[service_df[f] == user_profile[f]]
+                feature_df = service_df[service_df[f]
+                                        == user_profile[f].lower()]
                 n_entries = len(feature_df)
                 if n_entries == 0:  # if no entry matches, assign average score.
                     f_sscores.append(2.5)
