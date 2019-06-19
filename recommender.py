@@ -75,10 +75,11 @@ class recommender:
             self.n_feature, len(user_profile))
 
         # service & matchness scores from review dataset
-        s_score, m_score, _, _ = evaluation.calculate_scores(
+        s_score, m_score, _, _, n_valid_feature = evaluation.calculate_scores(
             user_profile.keys(), user_profile, self.review_dataframe, (self.service_weights, self.match_weights), verbose=verbose, n_service=self.n_service, n_feature=self.n_feature)
         if verbose:
-            print("\nservice score: {}\nmatchness score: {}".format(s_score, m_score))
+            print("\nnumber features used: {}\nservice score: {}\nmatchness score: {}".format(
+                n_valid_feature, s_score, m_score))
 
         # similarity between service description and user's goal
         d_score = similarity.calculate_scores(
@@ -130,7 +131,7 @@ def main():
     rr.init_weights()
 
     # dummy inupt from user: fixed feature, keywords of goal and rating for service & matchness
-    user_profile = {"ufeature1": "F", "ufeature2": "fr",
+    user_profile = {"ufeature1": "nan", "ufeature2": "fr",
                     "ufeature3": "U3", "ufeaure4": "CA"}
     user_goal = [['time', 0.5], ['talk', 0.5],
                  ['friendly', 0.5], ['advice', 0.5]]
