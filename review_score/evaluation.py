@@ -39,7 +39,7 @@ def calculate_scores(features, user_profile, df, weights, verbose=False, n_servi
     for s in range(n_service):
         n_valid_feature = n_feature
         service_df = df.loc[df["sID"] == s]  # service id starts from 0 in csv
-        # service_df = df.loc[df["sID"] == s+1] # service id starts from 1
+        # service_df = df.loc[df["sID"] == s + 1]  # service id starts from 1
         # print(s, service_df.head())
         f_sscores, f_mscores = [], []
         if len(service_df) == 0:    # nothing record for this service
@@ -61,6 +61,7 @@ def calculate_scores(features, user_profile, df, weights, verbose=False, n_servi
                     f_mscores.append(0)
                     # assign zero to feature's service score/matchness score
                     continue
+                # print("feature={}".format(f))
                 feature_df = service_df[service_df[f]
                                         == user_profile[f].lower()]
                 n_entries = len(feature_df)

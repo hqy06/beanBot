@@ -134,7 +134,7 @@ def main():
 
     # dummy inupt from user: fixed feature, keywords of goal and rating for service & matchness
     user_profile = {"ufeature1": "nan", "ufeature2": "fr",
-                    "ufeature3": "U3", "ufeaure4": "CA"}
+                    "ufeature3": "U3", "ufeature4": "CA"}
     user_goal = [['time', 0.5], ['talk', 0.5],
                  ['friendly', 0.5], ['advice', 0.5]]
     user_rating = {'Group Therapy': (3, 5),
