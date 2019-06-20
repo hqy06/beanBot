@@ -90,7 +90,7 @@ def vectorize(user_goal, weighted_keywords, n_service=N_SERVICE, n_keyword=N_KEY
     service_vectors = create_bunch_vector(weighted_keywords, vocabulary)
     assert (user_vector.shape[0] == service_vectors.shape[1]
             ), "number of vocabulary should be equal!"
-    assert (service_vectors.shape[0] == N_SERVICE)
+    assert (service_vectors.shape[0] == n_service)
     return vocabulary, user_vector, service_vectors
 
 
