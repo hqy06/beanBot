@@ -18,7 +18,7 @@ BeanBot is a university specific chatbot to assist in mental health service navi
 - ...and much more!
 
 
-Presented by [@gcartar](https://github.com/gcartar), [@hqy06](https://github.com/hqy06), [@joopia], [@YingWANG14](https://github.com/YingWANG14), mentor @[yupbank](https://github.com/yupbank) ...and the friendly people from the AI4Good Lab!
+Presented by [@gcartar](https://github.com/gcartar), [@hqy06](https://github.com/hqy06), [@joopia](https://github.com/joopica), [@YingWANG14](https://github.com/YingWANG14), mentor @[yupbank](https://github.com/yupbank) ...and the friendly people from the AI4Good Lab!
 
 
 ## The Continueing of Project BeanBot
